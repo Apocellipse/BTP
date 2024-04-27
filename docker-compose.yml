@@ -1,0 +1,49 @@
+version: '3.0'
+services:
+  redis_server:
+    container_name: redis_server
+    image: redis:6.2-alpine
+    ports:
+      - "6379:6379"
+    restart: always
+    command: redis-server
+    networks:
+      - mynetwork
+    volumes:
+      - cache:/data
+  key_server:
+    build:
+      context: .
+      dockerfile: Dockerfile_key_server
+    environment:
+        - REDIS_HOST=redis_server
+    ports:
+      - "5050:5050"
+    volumes:
+      - .:/key_server
+    command: python key_server.py
+    networks:
+      - mynetwork
+    depends_on:
+      - redis_server
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: myserver
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/prot1_server
+    depends_on:
+      - key_server
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
+volumes:
+  cache:
+    driver: local
+

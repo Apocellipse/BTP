@@ -1,0 +1,8 @@
+fastapi
+cryptography
+requests
+numpy
+pydantic
+pandas
+redis
+uvicorn
